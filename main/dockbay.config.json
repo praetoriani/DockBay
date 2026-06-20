@@ -1,0 +1,191 @@
+{
+    "dockbay": {
+
+        "sysinfo": {
+            "appname":      "DockBay",
+            "version":      "1.00.00",
+            "lastupdate":   "10.06.2026",
+            "author":       "Praetoriani",
+            "website":      "https://github.com/praetoriani"
+        },
+
+        "path": {
+            "root":      "/opt/docker",
+            "app-stack": "/opt/docker/apps",
+            "sys-stack": "/opt/docker/core",
+            "sql-stack": "/opt/docker/dbhost"
+        },
+
+        "network": {
+            "apphost": {
+                "name":    "dockbay-apps",
+                "driver":  "bridge",
+                "gateway": "172.20.0.1",
+                "subnet":  "172.20.0.0/16"
+            },
+            "syshost": {
+                "name":    "dockbay-core",
+                "driver":  "bridge",
+                "gateway": "172.22.0.1",
+                "subnet":  "172.22.0.0/16"
+            },
+            "sqlhost": {
+                "name":    "dockbay-dbcluster",
+                "driver":  "bridge",
+                "gateway": "172.25.0.1",
+                "subnet":  "172.25.0.0/16"
+            },
+            "traefik": {
+                "name":    "traefik-proxy",
+                "driver":  "bridge",
+                "gateway": "172.30.0.1",
+                "subnet":  "172.30.0.0/16"
+            }
+        },
+
+        "db": {
+            "mariadb": {
+                "host": "",
+                "user": "",
+                "pass": ""
+            },
+            "postgresql": {
+                "host": "",
+                "user": "",
+                "pass": ""
+            },
+            "mongodb": {
+                "host": "",
+                "user": "",
+                "pass": ""
+            }
+        },
+
+        "app": {
+            "bentopdf": {
+                "stack":   "/opt/dockbay/apps",
+                "image":   "ghcr.io/alam00000/bentopdf-simple:latest",
+                "fname":   "Bento PDF",
+                "sname":   "bentopdf",
+                "cname":   "BentoPDF",
+                "compose": "bento-compose.yml",
+                "ip": {
+                    "apphost":   "172.20.12.8"
+                },
+                "port": {
+                    "ext": "3011",
+                    "tcp": "8080"
+                },
+                "network": {
+                    "apphost":   "dockbay-apps"
+                },
+                "traefik": {
+                    "url": "bento.localhost",
+                    "ssl": "ssl.bento.local"
+                }
+            },
+            "blinko": {
+                "stack":   "/opt/dockbay/apps",
+                "image":   "blinkospace/blinko:latest",
+                "fname":   "Blinko",
+                "sname":   "blinko",
+                "cname":   "Blinko",
+                "compose": "blinko-compose.yml",
+                "dbname":  "BlinkoDB",
+                "secret":  "SGJnyGyPFofytSaJOaDWuFCVCe74deDDgFxFiqwwzWQ9mL1tN1MRmxi2FoECCEqt",
+                "ip": {
+                    "apphost":   "172.20.12.3",
+                    "sqlhost":   "172.25.0.9"
+                },
+                "port": {
+                    "ext": "1111",
+                    "tcp": "1111"
+                },
+                "network": {
+                    "apphost":   "dockbay-apps",
+                    "sqlhost":   "dockbay-dbcluster"
+                },
+                "mountpoint": {
+                    "appdata": "/appdata"
+                },
+                "traefik": {
+                    "url": "blinko.localhost",
+                    "ssl": "ssl.blinko.local"
+                }
+            },
+            "dockdploy": {
+                "stack":   "/opt/dockbay/core",
+                "image":   "hhftechnology/dock-dploy:latest",
+                "fname":   "Dock Dploy",
+                "sname":   "dockdploy",
+                "cname":   "DockDploy",
+                "compose": "dockdploy-compose.yml",
+                "ip": {
+                    "syshost":   "172.22.0.10"
+                },
+                "port": {
+                    "ext": "3004",
+                    "tcp": "3000"
+                },
+                "network": {
+                    "syshost":   "dockbay-core"
+                },
+                "datavolume": {
+                    "1": "DockDployData"
+                }
+            },
+            "dockge": {
+                "stack":   "/opt/dockbay/core",
+                "image":   "louislam/dockge:1",
+                "fname":   "Dockge",
+                "sname":   "dockge",
+                "cname":   "Dockge",
+                "compose": "dockge-compose.yml",
+                "ip": {
+                    "syshost":   "172.22.0.9"
+                },
+                "port": {
+                    "ext": "5001",
+                    "tcp": "5001"
+                },
+                "network": {
+                    "syshost":   "dockbay-core"
+                },
+                "mountpoint": {
+                    "appdata": "/appdata"
+                },
+                "datavolume": {
+                    "1": "DockgeStorage"
+                }
+            },
+            "dockhand": {
+                "stack":   "/opt/dockbay/core",
+                "image":   "fnsys/dockhand:latest",
+                "fname":   "Dockhand",
+                "sname":   "dockhand",
+                "cname":   "Dockhand",
+                "compose": "dockhand-compose.yml",
+                "dbname":  "DockhandDB",
+                "ip": {
+                    "syshost":   "172.22.0.6",
+                    "sqlhost":   "172.25.0.2"
+                },
+                "port": {
+                    "ext": "1001",
+                    "tcp": "3000"
+                },
+                "network": {
+                    "syshost":   "dockbay-core",
+                    "sqlhost":   "dockbay-dbcluster"
+                },
+                "datavolume": {
+                    "1": "DockhandStorage"
+                },
+                "traefik": {
+                    "url": "dockhand.localhost",
+                    "ssl": "ssl.dockhand.local"
+                }
+            }
+        }
+    }
+}
